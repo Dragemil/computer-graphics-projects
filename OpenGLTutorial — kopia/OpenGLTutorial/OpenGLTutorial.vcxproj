@@ -141,12 +141,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Lamps.cpp" />
     <ClCompile Include="lib\glad.c" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ball.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Lamps.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="resource.h" />
@@ -154,22 +157,12 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="lamp.vert" />
-    <None Include="shaders\basic_lighting.frag" />
-    <None Include="shaders\basic_lighting.vert" />
     <None Include="shaders\blinn.fs" />
     <None Include="shaders\blinn.vs" />
+    <None Include="shaders\phong.fs" />
+    <None Include="shaders\phong.vs" />
     <None Include="shaders\gouraud.fs" />
     <None Include="shaders\gouraud.vs" />
-    <None Include="shaders\lamp.frag" />
-    <None Include="shaders\light.frag" />
-    <None Include="shaders\light.vert" />
-    <None Include="shaders\shad.frag" />
-    <None Include="shaders\shad.vert" />
-    <None Include="shaders\shad2.frag" />
-    <None Include="shaders\shad2.vert" />
-    <None Include="shaders\texture.frag" />
-    <None Include="shaders\texture.vert" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="OpenGLTutorial.rc" />

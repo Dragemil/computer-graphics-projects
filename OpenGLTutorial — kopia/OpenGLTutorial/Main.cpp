@@ -10,6 +10,9 @@
 #include "model.h"
 #include "mesh.h"
 
+#include "Ball.h"
+#include "Lamps.h"
+
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -31,8 +34,18 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+//// shading
+//Shader phongShader;
+//Shader gouraudShader;
+//Shader shader;
+bool gouraud = false;
+
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+bool blinn = false;
+
+// objects
+auto ball = Ball();
+auto lamps = Lamps();
 
 int main()
 {
@@ -42,10 +55,6 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
 
 	// glfw window creation
 	// --------------------
@@ -76,86 +85,15 @@ int main()
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 
-	// build and compile our shader zprogram
+	// build and compile our shader program
 	// ------------------------------------
-	Shader lightingShader("shaders/blinn.vs", "shaders/blinn.fs");
-	Shader lampShader("shaders/lamp.vert", "shaders/lamp.frag");
+	Shader phongShader("shaders/phong.vs", "shaders/phong.fs");
+	// Shader gouraudShader("shaders/gouraud.vs", "shaders/gouraud.fs");
+	Shader shader = phongShader;
 
-	// set up vertex data (and buffer(s)) and configure vertex attributes
-	// ------------------------------------------------------------------
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-	};
-	// first, configure the cube's VAO (and VBO)
-	unsigned int VBO, cubeVAO;
-	glGenVertexArrays(1, &cubeVAO);
-	glGenBuffers(1, &VBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindVertexArray(cubeVAO);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-
-	// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	unsigned int lightVAO;
-	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// note that we update the lamp's position attribute's stride to reflect the updated buffer data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	Model curlingRock = Model("models/Curling_Stone_v1_L3.123cec9cc339-632e-45f8-9391-fe33cc6e7ef9/11720_Curling_Stone_v1_L3.obj");
-
+	Model stadium = Model("models/Wembley_stadion_V3_L3.123c03de6ad6-86e9-41ff-bff4-654781577365/10093_Wembley_stadion_V3_Iteration0.obj");
+	Model beachBall = Model("models/Beach_Ball_v2_L3.123cdf1ec704-c7ca-4faf-8f47-647b6e5df698/13517_Beach_Ball_v2_L3.obj");
+	Model lamp = Model("models/JapaneseLamp/Japanese_lamp__corona.obj");
 
 	// render loop
 	// -----------
@@ -167,82 +105,115 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// per-frame object movement
+		ball.Move(deltaTime); 
+		lamps.Move(deltaTime);
+
+		// check shaders
+		/*if (gouraud && shader.ID != gouraudShader.ID)
+		{
+			shader = gouraudShader;
+		}*/
+
+		if (!gouraud && shader.ID != phongShader.ID)
+		{
+			shader = phongShader;
+		}
+
+		// camera modes
+		switch (camera.mode)
+		{
+		case STILL:
+			camera.Position = glm::vec3{ -32.2921f, 3.06586f, 12.1431f };
+			camera.Front = glm::vec3{ 0.975157f, -0.130527f, -0.178974f };
+			camera.Up = glm::vec3{ 0.128383f, 0.991445f, -0.0235625f };
+			break;
+		case BINDED:
+			camera.Position = glm::vec3{ -1.24667f, 4.54421f, 5.54953f };
+			camera.Up = glm::vec3{ 0, 1, 0 };
+			break;
+		case FOLLOWING:
+			camera.Position = ball.FollowingPosition();
+			camera.Up = glm::vec3{ 0, 1, 0 };
+			break;
+		default:
+			break;
+		}
+
 		// input
 		// -----
 		processInput(window);
 
 		// render
 		// ------
-		glClearColor(0.17f + 0.15 * sin(lastFrame / 3), 0.17f + 0.15 * sin(lastFrame / 3), 0.19f + 0.15 * sin(lastFrame / 3), 1.0f);
+		glClearColor(
+			0.12f + 0.15 * sin(currentFrame / 3),
+			0.18f + 0.15 * sin(currentFrame / 3),
+			0.25f + 0.2 * sin(currentFrame / 3),
+			1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// be sure to activate shader when setting uniforms/drawing objects
-		/*lightingShader.use();
-		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("lightPos", lightPos);
-		lightingShader.setVec3("viewPos", camera.Position);
-		lightingShader.setFloat("ambientStrength", 0.03f + 0.17 * sin(lastFrame / 3));*/
-		lightingShader.use();
+		shader.use();
 
-		// view/projection transformations
+		// initial shader set up
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-		lightingShader.setMat4("projection", projection);
-		lightingShader.setMat4("view", view);
+		glm::mat4 view = camera.mode == BINDED || camera.mode == FOLLOWING
+			? glm::lookAt(camera.Position, ball.Position(), glm::vec3{ 0, 1, 0 }) 
+			: camera.GetViewMatrix();
+		shader.setMat4("projection", projection);
+		shader.setMat4("view", view);
+
+		shader.setBool("blinn", blinn);
 
 		// render the loaded model
-		lightingShader.setMat4("ProjectionMatrix", projection);
-		lightingShader.setVec3("ViewPosition", camera.Position);
+		shader.setVec3("ViewPosition", camera.Position);
 
-		lightingShader.setVec4("Spot.position", glm::vec4(lightPos, 1.0f));
-		lightingShader.setVec3("Spot.intensity", 0.0f, 1.0f, 0.0f);
-		lightingShader.setVec3("Spot.direction", glm::vec3{ 0, 1, 0 });
-		lightingShader.setFloat("Spot.exponent", 0.1);
-		lightingShader.setFloat("Spot.cutoff", 30);
+		for (int i = 0; i < 5; i++)
+		{
+			shader.setVec4("Spot[" + to_string(i) + "].position", glm::vec4(lamps.positions[i], 1.0f));
+			shader.setVec3("Spot[" + to_string(i) + "].intensity", 1.0f, 1.0f, 1.0f);
+			shader.setVec3("Spot[" + to_string(i) + "].direction", glm::normalize(ball.Position() - lamps.positions[i]));
+			shader.setFloat("Spot[" + to_string(i) + "].cutoff", 7);
+		}
 
-		lightingShader.setVec3("Kd", 0.5, 0.5, 0.5);
-		lightingShader.setVec3("Ka", 
-			0.05f + 0.16 * sin(currentFrame / 3), 
-			0.05f + 0.17 * sin(currentFrame / 3), 
-			0.06f + 0.18 * sin(currentFrame / 3));
-		lightingShader.setVec3("Ks", 1.0, 1.0, 1.0);
-		lightingShader.setFloat("Shininess", 200);
+		//shader.setVec4("Spot[4].position", glm::vec4(lamps.positions[4], 1.0f));
+		shader.setVec3("Spot[4].intensity", 0.5f, 0.5f, 0.5f);
+		shader.setVec3("Spot[4].direction", 0.0f, 1.0f, 0.0f);
 
-		/*lightingShader.setMat4("ModelViewMatrix", sponza_model);
-		lightingShader.setMat3("NormalMatrix", glm::transpose(glm::inverse(glm::mat3(sponza_model))));
-		lightingShader.setMat4("MVP", projection * view * sponza_model);*/
+		/*shader.setVec4("Spot.position", glm::vec4(lamps.positions[4], 1.0f));
+		shader.setVec3("Spot.intensity", 0.5f, 0.5f, 0.5f);
+		shader.setVec3("Spot.direction", 0.0f, 1.0f, 0.0f);*/
 
-		// world transformation
+		shader.setVec3("Kd", 0.5, 0.5, 0.5);
+		shader.setVec3("Ka", 
+			0.18f + 0.16 * sin(currentFrame / 3), 
+			0.18f + 0.17 * sin(currentFrame / 3), 
+			0.19f + 0.18 * sin(currentFrame / 3));
+		shader.setVec3("Ks", 1.0, 1.0, 1.0);
+		shader.setFloat("Shininess", 200);
+
+		// render the ball
+		shader.setMat4("model", ball.Model());
+		beachBall.Draw(shader);
+
+		// render the stadium
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(0.05f));
+		model = glm::scale(model, glm::vec3(0.004f));
 		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(1.0, 0.0, 0.0));
-		lightingShader.setMat4("ModelViewMatrix", model);
-		lightingShader.setMat3("NormalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-		lightingShader.setMat4("MVP", projection * view * model);
+		model = glm::translate(model, glm::vec3{ 0.0f, 0.0f, -3210.0f });
+		shader.setMat4("model", model);
 
-		// render the cube
-		curlingRock.Draw(lightingShader);
+		stadium.Draw(shader);
 
-		model = glm::translate(model, glm::vec3{ 50.0f, 0.0f, 0.0f });
-		lightingShader.setMat4("ModelViewMatrix", model);
-		lightingShader.setMat3("NormalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-		lightingShader.setMat4("MVP", projection* view* model);
-		curlingRock.Draw(lightingShader);
+		// render all the lamps
+		auto models = lamps.Models();
 
-		// also draw the lamp object
-		lampShader.use();
-		lampShader.setMat4("projection", projection);
-		lampShader.setMat4("view", view);
-		lampShader.setVec3("lightColor", 1.0f, 1.0f, 0.8f);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-		lampShader.setMat4("model", model);
-
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
+		for (int i = 0; i < 5; i++)
+		{
+			shader.setMat4("model", models[i]);
+			lamp.Draw(shader);
+		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -252,9 +223,8 @@ int main()
 
 	// optional: de-allocate all resources once they've outlived their purpose:
 	// ------------------------------------------------------------------------
-	glDeleteVertexArrays(1, &cubeVAO);
-	glDeleteVertexArrays(1, &lightVAO);
-	glDeleteBuffers(1, &VBO);
+	/*delete phongShader;
+	delete gouraudShader;*/
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
@@ -269,14 +239,57 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
+	// camera movement
+	if (camera.mode == FREE)
+	{
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			camera.ProcessKeyboard(FORWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			camera.ProcessKeyboard(LEFT, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			camera.ProcessKeyboard(RIGHT, deltaTime);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		camera.mode = STILL;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		camera.mode = BINDED;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+		camera.mode = FOLLOWING;
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+		camera.mode = FREE;
+
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		std::cout << "{" << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << "}" << std::endl;
+		std::cout << "{" << camera.Front.x << ", " << camera.Front.y << ", " << camera.Front.z << "}" << std::endl;
+		std::cout << "{" << camera.Up.x << ", " << camera.Up.y << ", " << camera.Up.z << "}" << std::endl;
+	}
+
+	// shading
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+		gouraud = true;
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+		gouraud = false;
+
+	// lighting
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+		blinn = true;
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+		blinn = false;
+
+	// ball tossing
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		ball.Accelerate();
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		ball.Reset();
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		ball.Rotate(deltaTime, true);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		ball.Rotate(deltaTime, false);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

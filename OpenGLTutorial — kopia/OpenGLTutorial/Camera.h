@@ -16,10 +16,18 @@ enum Camera_Movement {
 	RIGHT
 };
 
+enum CameraMode
+{
+	STILL,
+	BINDED,
+	FOLLOWING,
+	FREE,
+};
+
 // Default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 2.5f;
+const float SPEED = 7.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
 
@@ -38,6 +46,7 @@ public:
 	float Yaw;
 	float Pitch;
 	// Camera options
+	CameraMode mode = STILL;
 	float MovementSpeed;
 	float MouseSensitivity;
 	float Zoom;
@@ -113,6 +122,8 @@ public:
 		if (Zoom >= 45.0f)
 			Zoom = 45.0f;
 	}
+
+
 
 private:
 	// Calculates the front vector from the Camera's (updated) Euler Angles
