@@ -88,7 +88,7 @@ int main()
 	// build and compile our shader program
 	// ------------------------------------
 	Shader phongShader("shaders/phong.vs", "shaders/phong.fs");
-	// Shader gouraudShader("shaders/gouraud.vs", "shaders/gouraud.fs");
+	Shader gouraudShader("shaders/gouraud.vs", "shaders/gouraud.fs");
 	Shader shader = phongShader;
 
 	Model stadium = Model("models/Wembley_stadion_V3_L3.123c03de6ad6-86e9-41ff-bff4-654781577365/10093_Wembley_stadion_V3_Iteration0.obj");
@@ -110,10 +110,10 @@ int main()
 		lamps.Move(deltaTime);
 
 		// check shaders
-		/*if (gouraud && shader.ID != gouraudShader.ID)
+		if (gouraud && shader.ID != gouraudShader.ID)
 		{
 			shader = gouraudShader;
-		}*/
+		}
 
 		if (!gouraud && shader.ID != phongShader.ID)
 		{
@@ -171,15 +171,15 @@ int main()
 
 		for (int i = 0; i < 5; i++)
 		{
-			shader.setVec4("Spot[" + to_string(i) + "].position", glm::vec4(lamps.positions[i], 1.0f));
-			shader.setVec3("Spot[" + to_string(i) + "].intensity", 1.0f, 1.0f, 1.0f);
-			shader.setVec3("Spot[" + to_string(i) + "].direction", glm::normalize(ball.Position() - lamps.positions[i]));
-			shader.setFloat("Spot[" + to_string(i) + "].cutoff", 7);
+			shader.setVec4("Lights[" + to_string(i) + "].position", glm::vec4(lamps.positions[i], 1.0f));
+			shader.setVec3("Lights[" + to_string(i) + "].intensity", 1.0f, 1.0f, 1.0f);
+			shader.setVec3("Lights[" + to_string(i) + "].direction", glm::normalize(ball.Position() - lamps.positions[i]));
+			shader.setFloat("Lights[" + to_string(i) + "].cutoff", 7);
 		}
 
 		//shader.setVec4("Spot[4].position", glm::vec4(lamps.positions[4], 1.0f));
-		shader.setVec3("Spot[4].intensity", 0.5f, 0.5f, 0.5f);
-		shader.setVec3("Spot[4].direction", 0.0f, 1.0f, 0.0f);
+		shader.setVec3("Lights[4].intensity", 0.5f, 0.5f, 0.5f);
+		shader.setVec3("Lights[4].direction", 0.0f, 1.0f, 0.0f);
 
 		/*shader.setVec4("Spot.position", glm::vec4(lamps.positions[4], 1.0f));
 		shader.setVec3("Spot.intensity", 0.5f, 0.5f, 0.5f);
