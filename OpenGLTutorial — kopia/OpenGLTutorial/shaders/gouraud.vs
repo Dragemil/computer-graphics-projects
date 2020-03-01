@@ -32,9 +32,9 @@ uniform vec3 ViewPosition;
 uniform sampler2D texture_diffuse1;
 
 
-float attenuation(float dist)
+float attenuation(float d)
 {
-    return 1 + 0.007 * dist + 0.0002 * dist * dist;
+    return 1 + 0.008 * d + 0.0004 * d * d;
 }
 
 void main()
@@ -55,24 +55,23 @@ void main()
 
         if (angle < cutoff || i == 4) // last light is point light
         {
-            float lightDist = length(vec3(Lights[i].position) - Position);
-            vec3 spotIntensity = Lights[i].intensity / attenuation(lightDist);
+			float lightDist = length(vec3(Lights[i].position) - Position);
+			vec3 spotInt = Lights[i].intensity / attenuation(lightDist);
             
-            vec3 viewDir = normalize(ViewPosition - vec3(Position));
-            
+			vec3 viewDir = normalize(ViewPosition - vec3(Position));
+			diffuse += spotInt * Kd * max(dot(lightDir, Normal), 0);
+
             if (blinn)
             {
-                vec3 h = normalize(lightDir + viewDir);
-                specular += spotIntensity * Ks * pow(max(dot(h, Normal), 0), Shininess);
+                vec3 halfDir = normalize(lightDir + viewDir);
+                specular += spotInt * Ks * pow(max(dot(halfDir, Normal), 0), Shininess);
             }
             else
             {
                 vec3 reflectDir = reflect(-lightDir, Normal);
                 float reflectAngle = max(dot(reflectDir, viewDir), 0);
-                specular += spotIntensity * Ks * pow(reflectAngle, Shininess);
+                specular += spotInt * Ks * pow(reflectAngle, Shininess);
             }
-        
-            diffuse += spotIntensity * Kd * max(dot(lightDir, Normal), 0);
         }
     }
 

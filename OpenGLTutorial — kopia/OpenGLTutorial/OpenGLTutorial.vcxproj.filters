@@ -73,19 +73,10 @@
     <None Include="shaders\phong.vs">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shaders\blinn.fs">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shaders\blinn.vs">
-      <Filter>shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="OpenGLTutorial.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="blinn.txt" />
   </ItemGroup>
 </Project>
