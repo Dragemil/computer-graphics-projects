@@ -6,6 +6,8 @@ output: pdf_document
 ---
 
 # Dokumentacja
+**SKONFIGUROWANE WY£¥CZNIE NA DEBUG'U x86**
+
 ## Technologia
 Projekt graficzny oparty na technologii OpenGL.
 

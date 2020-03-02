@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>F:\doku\OneDrive - Politechnika Warszawska\GrafikaKomputerowa\OpenGLTutorial — kopia\OpenGLTutorial\includes;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\doku\OneDrive - Politechnika Warszawska\GrafikaKomputerowa\OpenGLTutorial — kopia\OpenGLTutorial\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>OpenGLTutorial\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>OpenGLTutorial\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>F:\doku\OneDrive - Politechnika Warszawska\GrafikaKomputerowa\OpenGLTutorial — kopia\OpenGLTutorial\includes;$(IncludePath)</IncludePath>
