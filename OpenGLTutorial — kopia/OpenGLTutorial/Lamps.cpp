@@ -33,7 +33,6 @@ glm::mat4* Lamps::Models()
 		models[i] = glm::scale(models[i], glm::vec3(0.002f));
 	}
 	
-	//model = glm::rotate(model, angle, glm::vec3{ 0, 0, 1 });
 	return models;
 }
 

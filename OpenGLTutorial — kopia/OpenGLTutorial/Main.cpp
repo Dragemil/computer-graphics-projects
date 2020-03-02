@@ -34,10 +34,7 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-//// shading
-//Shader phongShader;
-//Shader gouraudShader;
-//Shader shader;
+// shading
 bool gouraud = false;
 
 // lighting
@@ -177,13 +174,8 @@ int main()
 			shader.setFloat("Lights[" + to_string(i) + "].cutoff", 7);
 		}
 
-		//shader.setVec4("Spot[4].position", glm::vec4(lamps.positions[4], 1.0f));
 		shader.setVec3("Lights[4].intensity", 0.5f, 0.5f, 0.5f);
 		shader.setVec3("Lights[4].direction", 0.0f, 1.0f, 0.0f);
-
-		/*shader.setVec4("Spot.position", glm::vec4(lamps.positions[4], 1.0f));
-		shader.setVec3("Spot.intensity", 0.5f, 0.5f, 0.5f);
-		shader.setVec3("Spot.direction", 0.0f, 1.0f, 0.0f);*/
 
 		shader.setVec3("Kd", 0.5, 0.5, 0.5);
 		shader.setVec3("Ka", 
@@ -221,11 +213,6 @@ int main()
 		glfwPollEvents();
 	}
 
-	// optional: de-allocate all resources once they've outlived their purpose:
-	// ------------------------------------------------------------------------
-	/*delete phongShader;
-	delete gouraudShader;*/
-
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
 	glfwTerminate();
@@ -260,13 +247,6 @@ void processInput(GLFWwindow* window)
 		camera.mode = FOLLOWING;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		camera.mode = FREE;
-
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-	{
-		std::cout << "{" << camera.Position.x << ", " << camera.Position.y << ", " << camera.Position.z << "}" << std::endl;
-		std::cout << "{" << camera.Front.x << ", " << camera.Front.y << ", " << camera.Front.z << "}" << std::endl;
-		std::cout << "{" << camera.Up.x << ", " << camera.Up.y << ", " << camera.Up.z << "}" << std::endl;
-	}
 
 	// shading
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)

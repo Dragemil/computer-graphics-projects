@@ -5,6 +5,11 @@ VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLTutorial", "OpenGLTutorial\OpenGLTutorial.vcxproj", "{716AC9E8-3845-4ADF-8A6A-2727F1361B64}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E6BE0DC4-9298-4521-AE16-715BDB5824FF}"
+	ProjectSection(SolutionItems) = preProject
+		Opis.md = Opis.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
